@@ -30,15 +30,17 @@ jobs:
         fi
 
     - name: Build-arm5
-      run: GOARM=5 GOARCH=arm go build -o multiudp.arm5 -v .
-      
-    - name: Build-amd64
-      run: GOARCH=amd64 go build -o multiudp.amd64 -v .      
-      
+      run: |
+        GOARM=5 GOARCH=arm go build -o multiudp.arm5 -v .
+        GOARCH=amd64 go build -o multiudp.amd64 -v . 
+        GOARCH=mipsle GOMIPS=softfloat go build -o multiudp.mipsle -v . 
+        
+ 
     - name: pack
       run: |
         tar czf multiudp.arm5.tar.gz multiudp.arm5
         tar czf multiudp.amd64.tar.gz multiudp.amd64
+        tar czf multiudp.mipsle.tar.gz multiudp.mipsle
         
     - name: Create Release
       id: create_release
@@ -73,4 +75,13 @@ jobs:
         asset_name: multiudp.arm5.tar.gz
         asset_content_type: application/x-tgz
             
-   
+    - name: Upload Release Asset
+      id: upload-release-asset2
+      uses: actions/upload-release-asset@latest
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        asset_path: ./multiudp.mipsle.tar.gz
+        asset_name: multiudp.mipsle.tar.gz
+        asset_content_type: application/x-tgz 
