@@ -34,6 +34,7 @@ jobs:
         GOARM=5 GOARCH=arm go build -o multiudp.arm5 -v .
         GOARCH=amd64 go build -o multiudp.amd64 -v . 
         GOARCH=mipsle GOMIPS=softfloat go build -o multiudp.mipsle -v . 
+        GOARCH=arm64  go build -o multiudp.arm64 -v .         
         
  
     - name: pack
@@ -41,6 +42,7 @@ jobs:
         tar czf multiudp.arm5.tar.gz multiudp.arm5
         tar czf multiudp.amd64.tar.gz multiudp.amd64
         tar czf multiudp.mipsle.tar.gz multiudp.mipsle
+        tar czf multiudp.arm64.tar.gz multiudp.arm64
         
     - name: Create Release
       id: create_release
@@ -84,4 +86,15 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
         asset_path: ./multiudp.mipsle.tar.gz
         asset_name: multiudp.mipsle.tar.gz
+        asset_content_type: application/x-tgz 
+
+    - name: Upload Release Asset
+      id: upload-release-asset3
+      uses: actions/upload-release-asset@latest
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        asset_path: ./multiudp.arm64.tar.gz
+        asset_name: multiudp.arm64.tar.gz
         asset_content_type: application/x-tgz 
